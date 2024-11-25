@@ -62,9 +62,7 @@ const Dictaphone = () => {
           Reset
         </button>
       </div>
-      <p className="mt-4 text-gray-400 text-sm">
-        {transcript || "Your transcript will appear here."}
-      </p>
+
       {/* saved transcripts */}
       <div className="mt-6 w-full">
         <h2 className="text-lg font-bold text-gray-300 mb-2">
