@@ -10,6 +10,7 @@ const DiaryEntry: React.FC = () => {
   });
 
   const [text, setText] = useState<string>("");
+  const [entries, setEntries] = useState<{ [date: string]: string }>({}); // Stores diary entries
 
   // Speech Recognition
   const {
@@ -45,11 +46,26 @@ const DiaryEntry: React.FC = () => {
   //   };
 
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDate(e.target.value);
+    const newDate = e.target.value;
+    setDate(newDate);
+    // Load text for the selected date, or clear if no entry exists
+    setText(entries[newDate] || "");
   };
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
+  };
+
+  const handleSave = () => {
+    if (text.trim()) {
+      setEntries((prev) => ({
+        ...prev,
+        [date]: text.trim(),
+      }));
+      alert("Entry saved!");
+    } else {
+      alert("Cannot save empty entry.");
+    }
   };
 
   return (
@@ -109,10 +125,20 @@ const DiaryEntry: React.FC = () => {
         {/* Text Area */}
         <textarea
           className="w-full h-[60vh] resize-none border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          placeholder="How do you feel today? Write here or talk"
+          placeholder="How do you feel today? Write your thoughts here..."
           value={text}
           onChange={handleTextChange}
         ></textarea>
+
+        {/* Save Button */}
+        <div className="mt-4 flex justify-end">
+          <button
+            onClick={handleSave}
+            className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium"
+          >
+            Save
+          </button>
+        </div>
       </div>
     </div>
   );
