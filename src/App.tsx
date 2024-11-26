@@ -1,19 +1,22 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "./firebaseConfig";
 
-import VoiceRecorder from "./components/VoiceRecorder";
-import Dictaphone from "./components/Dictaphone";
 import DiaryEntry from "./components/DiaryEntry";
 import FirebaseAuth from "./components/FirebaseAuth";
 
 function App() {
-  return (
-    <div>
-      <FirebaseAuth />
-      {/* <DiaryEntry /> */}
-      {/* <VoiceRecorder />
-      <Dictaphone /> */}
-    </div>
-  );
+  const [user, setUser] = useState<null | object>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return <div>{user ? <DiaryEntry /> : <FirebaseAuth />}</div>;
 }
 
 export default App;

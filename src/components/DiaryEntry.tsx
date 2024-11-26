@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebaseConfig";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -12,7 +14,6 @@ const DiaryEntry: React.FC = () => {
   const [text, setText] = useState<string>("");
   const [entries, setEntries] = useState<{ [date: string]: string }>({}); // Stores diary entries
 
-  // Speech Recognition
   const {
     transcript,
     listening,
@@ -25,6 +26,16 @@ const DiaryEntry: React.FC = () => {
       <span>Error: Your browser does not support speech recognition.</span>
     );
   }
+
+  const handleLogOut = async () => {
+    try {
+      await signOut(auth);
+      alert("You have been logged out.");
+      window.location.reload(); // Optional: Redirect to login page
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   const handleStartListening = () => {
     SpeechRecognition.startListening({
@@ -41,14 +52,9 @@ const DiaryEntry: React.FC = () => {
     }
   };
 
-  //   const handleResetTranscript = () => {
-  //     resetTranscript();
-  //   };
-
   const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newDate = e.target.value;
     setDate(newDate);
-    // Load text for the selected date, or clear if no entry exists
     setText(entries[newDate] || "");
   };
 
@@ -69,11 +75,17 @@ const DiaryEntry: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+      {/* Log Out Button */}
+      <button
+        onClick={handleLogOut}
+        className="absolute top-4 right-4 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-sm"
+      >
+        Log Out
+      </button>
+
       <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-6">
-        {/* Date and Mic Controls */}
         <div className="flex items-center justify-between mb-4">
-          {/* Date */}
           <div className="flex items-center space-x-2">
             <label htmlFor="date" className="text-sm font-medium text-gray-600">
               Date:
@@ -87,7 +99,6 @@ const DiaryEntry: React.FC = () => {
             />
           </div>
 
-          {/* Mic Controls */}
           <div className="flex items-center space-x-2">
             <p className="text-sm font-medium text-gray-600">Mic:</p>
             <span
@@ -97,8 +108,6 @@ const DiaryEntry: React.FC = () => {
             >
               {listening ? "Open" : "Close"}
             </span>
-
-            {/* Buttons */}
             <div className="flex space-x-2">
               <button
                 onClick={handleStartListening}
@@ -112,17 +121,10 @@ const DiaryEntry: React.FC = () => {
               >
                 Stop
               </button>
-              {/* <button
-                onClick={handleResetTranscript}
-                className="px-3 py-1 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded text-xs border border-gray-400"
-              >
-                Reset
-              </button> */}
             </div>
           </div>
         </div>
 
-        {/* Text Area */}
         <textarea
           className="w-full h-[60vh] resize-none border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="How do you feel today? Write your thoughts here..."
@@ -130,7 +132,6 @@ const DiaryEntry: React.FC = () => {
           onChange={handleTextChange}
         ></textarea>
 
-        {/* Save Button */}
         <div className="mt-4 flex justify-end">
           <button
             onClick={handleSave}
